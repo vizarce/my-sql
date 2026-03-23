@@ -109,22 +109,28 @@ GO
 USE shop;
 GO
 
--- 2. Create tables (run in SSMS or sqlcmd)
-:r tsql\01_ddl_schema.sql
-:r tsql\02_dml_data.sql
+-- 2. Create tables (run in SSMS using :r — Windows paths shown below;
+--    use forward slashes on macOS/Linux)
+:r tsql/01_ddl_schema.sql
+:r tsql/02_dml_data.sql
 
 -- 3. Start learning!
-:r tsql\03_aggregation_group_by.sql
-:r tsql\04_subqueries_cte.sql
-:r tsql\05_window_functions.sql
-:r tsql\06_stored_procedures.sql
-:r tsql\07_transactions.sql
-:r tsql\08_indexes.sql
+:r tsql/03_aggregation_group_by.sql
+:r tsql/04_subqueries_cte.sql
+:r tsql/05_window_functions.sql
+:r tsql/06_stored_procedures.sql
+:r tsql/07_transactions.sql
+:r tsql/08_indexes.sql
 ```
 
 Or using `sqlcmd`:
 
 ```bash
+# Linux / macOS
+sqlcmd -S localhost -d shop -i tsql/01_ddl_schema.sql
+sqlcmd -S localhost -d shop -i tsql/02_dml_data.sql
+
+# Windows (PowerShell / cmd)
 sqlcmd -S localhost -d shop -i tsql\01_ddl_schema.sql
 sqlcmd -S localhost -d shop -i tsql\02_dml_data.sql
 ```

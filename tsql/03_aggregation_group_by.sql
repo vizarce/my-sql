@@ -116,7 +116,7 @@ ORDER BY product_count DESC;
 -- Customers who placed 3 or more orders
 SELECT
     c.customer_id,
-    c.first_name + N' ' + c.last_name AS customer_name,  -- T-SQL string concat
+    c.first_name + N' ' + c.last_name AS customer_name,
     COUNT(o.order_id) AS total_orders
 FROM customers c
 JOIN orders o ON o.customer_id = c.customer_id
