@@ -1,14 +1,23 @@
 # my-sql — SQL Learning Repository
 
-A fully self-contained MySQL learning database for practising:
+A fully self-contained SQL learning database for practising:
 
 - **Aggregation & GROUP BY**
 - **Subqueries & CTE (Common Table Expressions)**
 - **Window Functions**
+- **Stored Procedures** (T-SQL)
+- **Transactions** (T-SQL)
+- **Indexes** (T-SQL — clustered, nonclustered, columnstore, filtered, covering)
+
+The repository contains two parallel sets of scripts:
+- `sql/` — **MySQL** dialect
+- `tsql/` — **SQL Server / T-SQL** dialect (same schema and data, T-SQL syntax)
 
 ---
 
 ## 📂 File Structure
+
+### MySQL (`sql/`)
 
 | File | Description |
 |------|-------------|
@@ -17,6 +26,19 @@ A fully self-contained MySQL learning database for practising:
 | `sql/03_aggregation_group_by.sql` | ~20 annotated examples of aggregation and GROUP BY |
 | `sql/04_subqueries_cte.sql`       | ~20 annotated examples of subqueries and CTEs |
 | `sql/05_window_functions.sql`     | ~20 annotated examples of window functions |
+
+### SQL Server / T-SQL (`tsql/`)
+
+| File | Description |
+|------|-------------|
+| `tsql/01_ddl_schema.sql` | DDL — T-SQL `CREATE TABLE` (`IDENTITY`, `NVARCHAR`, `CHECK` constraints) |
+| `tsql/02_dml_data.sql`   | Seed data — `SET IDENTITY_INSERT ON/OFF` + `INSERT` statements |
+| `tsql/03_aggregation_group_by.sql` | Aggregation & GROUP BY — T-SQL syntax (`TOP`, `GROUPING SETS`, `CUBE`) |
+| `tsql/04_subqueries_cte.sql`       | Subqueries & CTEs — T-SQL syntax (recursive CTE without `RECURSIVE` keyword, `REPLICATE`, `FORMAT`) |
+| `tsql/05_window_functions.sql`     | Window functions — T-SQL syntax (inline `OVER()`, no named `WINDOW` clause) |
+| `tsql/06_stored_procedures.sql`    | Stored Procedures — `CREATE OR ALTER PROCEDURE`, `@params`, `OUTPUT`, `TRY-CATCH`, `RAISERROR`, `THROW` |
+| `tsql/07_transactions.sql`         | Transactions — `BEGIN TRAN`, `COMMIT`, `ROLLBACK`, `SAVE TRAN`, `@@TRANCOUNT`, `XACT_ABORT`, isolation levels |
+| `tsql/08_indexes.sql`              | Indexes — clustered, nonclustered, unique, composite, covering (`INCLUDE`), filtered, columnstore, `FILLFACTOR`, fragmentation |
 
 ---
 
@@ -49,7 +71,7 @@ products ──< reviews >── customers
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start — MySQL
 
 ```sql
 -- 1. Create a fresh database
@@ -78,6 +100,37 @@ mysql -u root -p shop < sql/02_dml_data.sql
 
 ---
 
+## 🚀 Quick Start — SQL Server / T-SQL
+
+```sql
+-- 1. Create a fresh database
+CREATE DATABASE shop;
+GO
+USE shop;
+GO
+
+-- 2. Create tables (run in SSMS or sqlcmd)
+:r tsql\01_ddl_schema.sql
+:r tsql\02_dml_data.sql
+
+-- 3. Start learning!
+:r tsql\03_aggregation_group_by.sql
+:r tsql\04_subqueries_cte.sql
+:r tsql\05_window_functions.sql
+:r tsql\06_stored_procedures.sql
+:r tsql\07_transactions.sql
+:r tsql\08_indexes.sql
+```
+
+Or using `sqlcmd`:
+
+```bash
+sqlcmd -S localhost -d shop -i tsql\01_ddl_schema.sql
+sqlcmd -S localhost -d shop -i tsql\02_dml_data.sql
+```
+
+---
+
 ## 📚 Topics Covered
 
 ### 03 — Aggregation & GROUP BY
@@ -90,10 +143,10 @@ mysql -u root -p shop < sql/02_dml_data.sql
 | 4 | `HAVING` — filter on aggregated values |
 | 5 | Expressions inside aggregates (gross vs net revenue, profit margin) |
 | 6 | Conditional aggregation — `CASE` inside `SUM` / `COUNT` |
-| 7 | `ORDER BY` aggregate result, `LIMIT` |
+| 7 | `ORDER BY` aggregate result, `TOP` (T-SQL) / `LIMIT` (MySQL) |
 | 8 | `COUNT(DISTINCT …)` |
 | 9 | Multi-table aggregation with `JOIN` |
-| 10 | `GROUP BY … WITH ROLLUP` — sub-totals and grand totals |
+| 10 | `ROLLUP`, `CUBE`, `GROUPING SETS` (T-SQL) / `WITH ROLLUP` (MySQL) |
 
 ### 04 — Subqueries & CTE
 
@@ -126,8 +179,74 @@ mysql -u root -p shop < sql/02_dml_data.sql
 | 8 | `FIRST_VALUE` / `LAST_VALUE` — boundary values in frame |
 | 9 | `PERCENT_RANK` / `CUME_DIST` — relative position |
 | 10 | Partitioned windows — analytics within groups |
-| 11 | Named `WINDOW` clause — define once, reuse many times |
+| 11 | Named `WINDOW` clause (MySQL) / inline `OVER()` (T-SQL) |
 | 12 | Combined analytical report — all techniques together |
+
+### 06 — Stored Procedures *(T-SQL only)*
+
+| # | Topic |
+|---|-------|
+| 1 | Basic procedure — no parameters, `SET NOCOUNT ON` |
+| 2 | Input parameters, optional filter (`= NULL` default) |
+| 3 | `OUTPUT` parameter to return a scalar value |
+| 4 | Default parameter values |
+| 5 | Procedure with recursive CTE inside |
+| 6 | Procedure using a `#temp` table |
+| 7 | `TRY-CATCH` error handling + `RAISERROR` / `THROW` |
+| 8 | Nested procedure call (`EXEC` inside a procedure) |
+| 9 | Procedure with an embedded transaction |
+| 10 | `CREATE OR ALTER PROCEDURE` — idempotent definition |
+
+### 07 — Transactions *(T-SQL only)*
+
+| # | Topic |
+|---|-------|
+| 1 | `BEGIN TRANSACTION` / `COMMIT` |
+| 2 | `ROLLBACK` on a business-rule violation |
+| 3 | `@@TRANCOUNT` — nesting counter |
+| 4 | `SAVE TRANSACTION` — named savepoints (partial rollback) |
+| 5 | `SET XACT_ABORT ON` — automatic rollback on error |
+| 6 | `TRY-CATCH` wrapping a transaction |
+| 7 | Named transactions |
+| 8 | Isolation levels (`READ UNCOMMITTED`, `REPEATABLE READ`, `SNAPSHOT`) |
+| 9 | `SET IMPLICIT_TRANSACTIONS ON` |
+| 10 | `sys.dm_tran_active_transactions` — inspect open transactions |
+
+### 08 — Indexes *(T-SQL only)*
+
+| # | Topic |
+|---|-------|
+| 1 | Clustered index — concept and syntax |
+| 2 | Nonclustered index — basic single-column |
+| 3 | Unique index |
+| 4 | Composite (multi-column) index — column order matters |
+| 5 | Covering index — `INCLUDE` columns for index-only scans |
+| 6 | Filtered index — partial index with `WHERE` predicate |
+| 7 | Nonclustered columnstore index |
+| 8 | Clustered columnstore index (fact-table / DWH use case) |
+| 9 | Index options: `FILLFACTOR`, `PAD_INDEX`, `ONLINE`, `SORT_IN_TEMPDB` |
+| 10 | `sys.indexes` / `sys.index_columns` — index metadata |
+| 11 | `sys.dm_db_index_usage_stats` — usage statistics |
+| 12 | `sys.dm_db_index_physical_stats` — fragmentation + dynamic maintenance |
+
+---
+
+## 🔄 MySQL vs T-SQL Quick Reference
+
+| Feature | MySQL | T-SQL (SQL Server) |
+|---------|-------|-------------------|
+| Auto-increment | `AUTO_INCREMENT` | `IDENTITY(1,1)` |
+| ENUM type | `ENUM('a','b')` | `NVARCHAR(n)` + `CHECK (col IN (...))` |
+| String concat | `CONCAT(a,b)` | `a + b` or `CONCAT(a,b)` |
+| Limit rows | `LIMIT n` | `TOP n` or `OFFSET 0 ROWS FETCH NEXT n ROWS ONLY` |
+| Date format | `DATE_FORMAT(d, '%Y-%m')` | `FORMAT(d, 'yyyy-MM')` |
+| Repeat string | `REPEAT(s, n)` | `REPLICATE(s, n)` |
+| Recursive CTE | `WITH RECURSIVE cte AS (…)` | `WITH cte AS (…)` (no `RECURSIVE` keyword) |
+| Named window | `WINDOW w AS (…)` | Not supported — inline `OVER(…)` required |
+| Rollup syntax | `GROUP BY a, b WITH ROLLUP` | `GROUP BY ROLLUP(a, b)` |
+| Cube / grouping sets | — | `GROUP BY CUBE(a,b)` / `GROUP BY GROUPING SETS(…)` |
+| Stored procedure | `DELIMITER // … CREATE PROCEDURE …` | `CREATE [OR ALTER] PROCEDURE … AS BEGIN…END` |
+| Transaction save | `SAVEPOINT name` | `SAVE TRANSACTION name` |
 
 ---
 
@@ -136,5 +255,7 @@ mysql -u root -p shop < sql/02_dml_data.sql
 1. Run `01_ddl_schema.sql` and `02_dml_data.sql` once to set up your environment.
 2. Open each topic file and run queries **one block at a time** — every query is preceded by a comment explaining what it demonstrates.
 3. Experiment: modify `WHERE`, `HAVING`, `PARTITION BY` conditions to build intuition.
-4. The **recursive CTEs** (section 04, queries 11–12) require MySQL 8.0+.
-5. All **window functions** require MySQL 8.0+.
+4. The **recursive CTEs** (section 04, queries 11–12) require MySQL 8.0+ / SQL Server 2005+.
+5. All **window functions** require MySQL 8.0+ / SQL Server 2012+.
+6. For T-SQL files, use **SQL Server Management Studio (SSMS)** or **Azure Data Studio** for the best experience.
+7. T-SQL `06_stored_procedures.sql`, `07_transactions.sql`, and `08_indexes.sql` cover SQL Server-specific features with no MySQL equivalents.
